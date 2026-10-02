@@ -9,10 +9,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Email and amount required' });
   }
 
-  const BUCKPAY_API_KEY = process.env.BUCKPAY_API_KEY;
-  const BUCKPAY_USER_AGENT = process.env.BUCKPAY_USER_AGENT;
+  const API_KEY = process.env.API_KEY;
+  const USER_AGENT = process.env.USER_AGENT;
 
-  if (!BUCKPAY_API_KEY || !BUCKPAY_USER_AGENT) {
+  if (!API_KEY || !USER_AGENT) {
     return res.status(500).json({ error: 'Server not configured' });
   }
 
@@ -20,8 +20,8 @@ export default async function handler(req, res) {
     const response = await fetch('https://api.realtechdev.com.br/v1/transactions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${BUCKPAY_API_KEY}`,
-        'User-Agent': BUCKPAY_USER_AGENT,
+        'Authorization': `Bearer ${API_KEY}`,
+        'User-Agent': USER_AGENT,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
