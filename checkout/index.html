@@ -3167,34 +3167,5 @@ async function gerarPixImediato() {
 </script>
 </body>
 
-// Função para copiar o código Pix
-function copiarPix() {
-  const pixCodeInput = document.getElementById('pixCode');
-  const qrCodeDiv = document.getElementById('qrCode');
-  const imgElement = qrCodeDiv.querySelector('img');
-  
-  if (imgElement && imgElement.src) {
-    const pixCode = imgElement.src;
-    pixCodeInput.value = pixCode;
-    
-    navigator.clipboard.writeText(pixCode).then(() => {
-      // Mostrar confirmação
-      const btn = event.target;
-      const originalText = btn.innerText;
-      btn.innerText = 'Copiado!';
-      btn.style.background = 'linear-gradient(135deg, #4caf50, #66bb6a)';
-      
-      setTimeout(() => {
-        btn.innerText = originalText;
-        btn.style.background = 'linear-gradient(135deg, #f6842c, #ff7c58)';
-      }, 2000);
-    }).catch(err => {
-      console.error('Erro ao copiar:', err);
-      alert('Erro ao copiar o código Pix');
-    });
-  }
-}
-
-
 <!-- Mirrored from privacybadmi.site/checkout/ by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 02 Oct 2026 07:07:06 GMT -->
 </html>
