@@ -9,8 +9,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Email and amount required' });
   }
 
-  const API_KEY = process.env.BUCKPAY_SECRET_TOKEN;
-  const USER_AGENT = process.env.BUCKPAY_USER_AGENT;
+  const API_KEY = process.env.API_KEY;
+  const USER_AGENT = process.env.USER_AGENT;
 
   if (!API_KEY || !USER_AGENT) {
     return res.status(500).json({ error: 'Server not configured' });
