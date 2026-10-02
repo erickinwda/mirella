@@ -133,7 +133,7 @@
 <!-- TWITTER -->
 <div class="redes-sociais">
 <div onclick="abrirPopupAssinatura(this)" class="icone-social">
-  <img src="imagens/twitter.webp" alt="twitter" class="telegram-img">
+  <img src="imagens/twitter.png" alt="twitter" class="telegram-img">
 </div>
   
   <!-- TELEGRAM -->
@@ -390,6 +390,51 @@
   </div>
 </div>
 </div>
+</div>
+
+<!-- MODAL PIX -->
+<div id="modalPix" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; padding:20px;">
+  <div style="background:#1a1a1a; border-radius:24px; max-width:357px; width:100%; padding:24px; text-align:center; position:relative; animation:fadeIn 0.4s ease;">
+    <button onclick="fecharModalPix()" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">&times;</button>
+    
+    <!-- Foto + Nome -->
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+      <div style="position:relative;">
+        <img src="imagens/logo.webp" alt="Capa" style="width:64px; height:64px; border-radius:12px; object-fit:cover;">
+        <img src="imagens/logowhite.webp" alt="Perfil" style="width:24px; height:24px; border-radius:50%; border:2px solid #fff; position:absolute; bottom:-2px; right:-2px;">
+      </div>
+      <div style="text-align:left;">
+        <div style="color:#fff; font-weight:600; font-size:15px;">BAD MI | MC MIRELLA</div>
+        <div style="color:#aaa; font-size:13px;">@badmi</div>
+      </div>
+    </div>
+
+    <!-- Benefícios -->
+    <div style="background:linear-gradient(135deg, #f6842c, #ff7c58); border-radius:16px; padding:16px; margin-bottom:16px; position:relative; overflow:hidden;">
+      <div style="position:absolute; top:-10px; right:-10px; width:60px; height:60px; background:rgba(255,255,255,0.15); border-radius:50%;"></div>
+      <div style="position:absolute; bottom:-15px; left:-15px; width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:50%;"></div>
+      <div style="color:#fff; font-weight:600; font-size:14px; margin-bottom:8px; position:relative; z-index:1;">⭐ BENEFÍCIOS EXCLUSIVOS ⭐</div>
+      <div style="color:#fff; font-size:13px; line-height:1.6; position:relative; z-index:1;">
+        ✦ Acesso ao conteúdo<br>
+        ✦ Chat exclusivo com o criador<br>
+        ✦ Cancele a qualquer hora
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div id="emailStep" style="margin-bottom:16px;">
+      <input type="email" id="emailPix" placeholder="Seu melhor email" style="width:100%; padding:12px; border-radius:12px; border:1px solid #333; background:#2a2a2a; color:#fff; font-size:14px; outline:none; font-family:'Poppins',sans-serif;" />
+      <button onclick="gerarPix()" style="width:100%; margin-top:12px; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg, #f6842c, #ff7c58); color:#fff; font-weight:600; font-size:15px; cursor:pointer; font-family:'Poppins',sans-serif;">Continuar</button>
+      <p id="erroEmail" style="display:none; color:#ff6b6b; font-size:12px; margin-top:8px;">Digite um email válido</p>
+    </div>
+
+    <!-- QR Code -->
+    <div id="qrStep" style="display:none;">
+      <p style="color:#fff; font-size:13px; margin-bottom:12px;">Escaneie o QR Code para pagar com Pix</p>
+      <div id="qrCode" style="background:#fff; border-radius:12px; padding:16px; display:inline-block;"></div>
+      <p id="statusPix" style="color:#aaa; font-size:12px; margin-top:12px;">Aguardando pagamento...</p>
+    </div>
+  </div>
 </div>
 
 <!-- CSS -->
@@ -3025,6 +3070,52 @@ function fixarPopupTopo() {
 window.visualViewport?.addEventListener("resize", fixarPopupTopo);
 window.addEventListener("orientationchange", fixarPopupTopo);
 document.addEventListener("DOMContentLoaded", fixarPopupTopo);
+
+/* ===== MODAL PIX ===== */
+function fecharModalPix() {
+  document.getElementById("modalPix").style.display = "none";
+}
+
+async function gerarPix() {
+  const email = document.getElementById("emailPix").value.trim();
+  const erro = document.getElementById("erroEmail");
+  
+  if (!email || !email.includes("@")) {
+    erro.style.display = "block";
+    return;
+  }
+  erro.style.display = "none";
+
+  const emailStep = document.getElementById("emailStep");
+  const qrStep = document.getElementById("qrStep");
+  const statusPix = document.getElementById("statusPix");
+  
+  emailStep.style.display = "none";
+  qrStep.style.display = "block";
+  statusPix.innerText = "Gerando QR Code...";
+
+  try {
+    const res = await fetch("/api/create-transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, amount: 990 })
+    });
+    const data = await res.json();
+
+    if (data.qr_code || data.qrCode || data.qr_code_url) {
+      const qrUrl = data.qr_code || data.qrCode || data.qr_code_url;
+      document.getElementById("qrCode").innerHTML = `<img src="${qrUrl}" alt="QR Code Pix" style="width:200px; height:200px;" />`;
+      statusPix.innerText = "Pagamento confirmado!";
+    } else if (data.copy_and_pay) {
+      document.getElementById("qrCode").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.copy_and_pay)}" alt="QR Code Pix" style="width:200px; height:200px;" />`;
+      statusPix.innerText = "Copie e cole no app do banco para pagar";
+    } else {
+      statusPix.innerText = "QR Code disponível em breve";
+    }
+  } catch (e) {
+    statusPix.innerText = "Erro ao gerar QR Code. Tente novamente.";
+  }
+}
 </script>
 </body>
 
