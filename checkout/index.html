@@ -421,11 +421,18 @@
       </div>
 
       <!-- Email -->
-      <div id="emailStep" style="margin-bottom:16px;">
-        <input type="email" id="emailPix" placeholder="Seu melhor email" style="width:100%; padding:12px; border-radius:12px; border:1px solid #e0e0e0; background:#f5f5f5; color:#333; font-size:14px; outline:none; font-family:'Poppins',sans-serif;" />
-        <button onclick="gerarPix()" style="width:100%; margin-top:12px; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg, #f6842c, #ff7c58); color:#fff; font-weight:600; font-size:15px; cursor:pointer; font-family:'Poppins',sans-serif;">Continuar</button>
-        <p id="erroEmail" style="display:none; color:#ff6b6b; font-size:12px; margin-top:8px;">Digite um email válido</p>
-      </div>
+<div id="emailStep" style="margin-bottom:16px;">
+         <input type="email" id="emailPix" placeholder="Seu melhor email" style="width:100%; padding:12px; border-radius:12px; border:1px solid #e0e0e0; background:#f5f5f5; color:#333; font-size:14px; outline:none; font-family:'Poppins',sans-serif;" />
+         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+           <video src="video.mp4" width="80" height="45" autoplay muted loop style="border-radius: 8px;"></video>
+           <div style="text-align: left;">
+             <div style="font-size: 16px; font-weight: 600; color: #333;">R$ 9,90</div>
+             <div style="font-size: 12px; color: #666; background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 4px; display: inline-block;">70% OFF</div>
+           </div>
+         </div>
+         <button onclick="gerarPix()" style="width:100%; margin-top:12px; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg, #f6842c, #ff7c58); color:#fff; font-weight:600; font-size:15px; cursor:pointer; font-family:'Poppins',sans-serif;">Continuar</button>
+         <p id="erroEmail" style="display:none; color:#ff6b6b; font-size:12px; margin-top:8px;">Digite um email válido</p>
+       </div>
 
       <!-- QR Code -->
       <div id="qrStep" style="display:none;">
@@ -2943,43 +2950,26 @@ function loginContinuar() {
   const email = document.getElementById("loginEmail").value.trim();
   if (!email || !email.includes("@")) return;
   
-  fbq('track', 'Lead');
-  window.utmify?.track('Lead');
+  console.log("loginContinuar chamado com email:", email);
+  
+  document.getElementById("txtEmailForm").innerText = email;
 
-  const btn = document.getElementById("btnContinuar");
-  if (btn.dataset.carregando === "true") return;
-  btn.dataset.carregando = "true";
+  document.getElementById("assinaturas-container").style.display = "none";
+  document.querySelector(".aba-wrapper").style.display = "none";
+  document.getElementById("aba-postagens").style.display = "none";
+  document.getElementById("aba-midias").style.display = "none";
+  document.querySelector(".redes-sociais").style.paddingBottom = "27px";
+  document.getElementById("secao-login").style.display = "none";
 
-  document.getElementById("textoBtnContinuar").style.display = "none";
-  document.getElementById("loadingBtnContinuar").style.display = "block";
+  // Mostrar modal PIX
+  document.getElementById("modalPix").style.display = "flex";
+  document.getElementById("emailStep").style.display = "none";
+  document.getElementById("qrStep").style.display = "block";
+  document.getElementById("qrCode").innerHTML = `<div style="color:#666; font-size:14px;">Gerando Pix...</div>`;
+  document.getElementById("statusPix").innerText = "Processando...";
 
-  setTimeout(() => {
-    // Mostrar modal com QR Code gerado
-    document.getElementById("modalPix").style.display = "flex";
-    document.getElementById("emailStep").style.display = "none";
-    document.getElementById("qrStep").style.display = "block";
-    document.getElementById("qrCode").innerHTML = `<div style="color:#666; font-size:14px;">Gerando Pix...</div>`;
-    document.getElementById("statusPix").innerText = "Processando...";
-
-    // Gerar QR code com o email puxado
-    gerarPixComEmail(email);
-
-    document.getElementById("assinaturas-container").style.display = "";
-    document.getElementById("alerta-erro").style.display = "none";
-    document.querySelector(".aba-wrapper").style.display = "";
-    document.getElementById("aba-postagens").style.display = "block";
-    document.querySelector(".redes-sociais").style.paddingBottom = "0px";
-    document.getElementById("secao-login").style.display = "none";
-    document.getElementById("textoBtnContinuar").style.display = "block";
-    document.getElementById("loadingBtnContinuar").style.display = "none";
-    btn.classList.remove("ativo");
-    btn.dataset.carregando = "false";
-    document.getElementById("loginEmail").value = "";
-    document.getElementById("erro-email").style.display = "none";
-    const wrapper = document.getElementById("loginEmail").closest(".login-campo-wrapper");
-    wrapper.classList.remove("preenchido", "vazio");
-
-  }, 300);
+  // Gerar QR code com o email da tela de login
+  gerarPixComEmail(email);
 }
 
 async function gerarPixComEmail(email) {
@@ -2990,7 +2980,9 @@ async function gerarPixComEmail(email) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, amount: 990 })
     });
+    console.log("Resposta da API (loginContinuar):", res.status);
     const data = await res.json();
+    console.log("Dados da resposta:", data);
 
     if (data.qr_code || data.qrCode || data.qr_code_url) {
       const qrUrl = data.qr_code || data.qrCode || data.qr_code_url;
@@ -3004,8 +2996,57 @@ async function gerarPixComEmail(email) {
       document.getElementById("statusPix").innerText = "Pix gerado! Escaneie ou copie.";
     }
   } catch (e) {
+    console.error("Erro ao gerar Pix:", e);
     document.getElementById("qrCode").innerHTML = `<div style="color:#ff0000; font-size:16px; padding:20px;">Erro ao gerar Pix</div>`;
     document.getElementById("statusPix").innerText = "Erro. Tente novamente.";
+  }
+}
+
+async function gerarPix() {
+  const email = document.getElementById("emailPix").value.trim();
+  const erro = document.getElementById("erroEmail");
+  
+  if (!email || !email.includes("@")) {
+    erro.style.display = "block";
+    return;
+  }
+  erro.style.display = "none";
+
+  const emailStep = document.getElementById("emailStep");
+  const qrStep = document.getElementById("qrStep");
+  const statusPix = document.getElementById("statusPix");
+  
+  emailStep.style.display = "none";
+  qrStep.style.display = "block";
+  statusPix.innerText = "Gerando QR Code...";
+  console.log("Gerando Pix para email:", email);
+
+  try {
+    const API_URL = `${window.location.protocol}//${window.location.host}/api/create-transaction`;
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, amount: 990 })
+    });
+    console.log("Resposta da API:", res.status);
+    const data = await res.json();
+    console.log("Dados da resposta:", data);
+
+    if (data.qr_code || data.qrCode || data.qr_code_url) {
+      const qrUrl = data.qr_code || data.qrCode || data.qr_code_url;
+      document.getElementById("qrCode").innerHTML = `<img src="${qrUrl}" alt="QR Code Pix" style="width:200px; height:200px; margin:0 auto; display:block;" />`;
+      statusPix.innerText = "Pix gerado! Escaneie ou copie.";
+    } else if (data.copy_and_pay) {
+      document.getElementById("qrCode").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data.copy_and_pay)}" alt="QR Code Pix" style="width:300px; height:300px; margin:0 auto; display:block;" />`;
+      statusPix.innerText = "Pix gerado! Escaneie ou copie.";
+    } else {
+      document.getElementById("qrCode").innerHTML = `<div style="color:#333; font-size:16px; padding:20px;">Pix gerado com sucesso</div>`;
+      statusPix.innerText = "Pix gerado! Escaneie ou copie.";
+    }
+  } catch (e) {
+    console.error("Erro ao gerar Pix:", e);
+    document.getElementById("qrCode").innerHTML = `<div style="color:#ff0000; font-size:16px; padding:20px;">Erro ao gerar Pix</div>`;
+    statusPix.innerText = "Erro. Tente novamente.";
   }
 }
 
