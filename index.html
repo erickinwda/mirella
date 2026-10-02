@@ -46,10 +46,10 @@
 
 <script>
 var isLocal = window.location.hostname === 'localhost' || window.location.protocol === 'file:';
-var DOMINIO = isLocal ? './checkout' : 'https://' + window.location.hostname + '/';
+var DOMINIO = isLocal ? './checkout' : 'https://' + window.location.hostname;
 function irParaCheckout() {
   const params = window.location.search;
-  window.location.href = DOMINIO + '/index.html' + params;
+  window.location.href = DOMINIO + '/checkout/' + params;
 }
 </script>
 
