@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/checkout", "dest": "/checkout/index.html" },
+    { "src": "/checkout/", "dest": "/checkout/index.html" },
+    { "src": "/checkout(.*)", "dest": "/checkout/$1" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
