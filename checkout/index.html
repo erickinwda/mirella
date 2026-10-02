@@ -3095,7 +3095,8 @@ async function gerarPix() {
   statusPix.innerText = "Gerando QR Code...";
 
   try {
-    const res = await fetch("/api/create-transaction", {
+    const API_URL = `${window.location.protocol}//${window.location.host}/api/create-transaction`;
+    const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, amount: 990 })
