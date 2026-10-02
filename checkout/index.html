@@ -2912,9 +2912,7 @@ function abrirPopupAssinatura(elemento) {
   if (elemento && elemento.querySelector && elemento.querySelector(".preco")) {
     valorSelecionado = elemento.querySelector(".preco").innerText.trim();
   } else {
-      
-/* ATUALIZAR PREÇO RODAPE */
-    valorSelecionado = "R$ 9,90"; // <!-- mudar -->
+    valorSelecionado = "R$ 9,90";
   }
 
   document.getElementById("assinaturas-container").style.display = "none";
@@ -2922,7 +2920,14 @@ function abrirPopupAssinatura(elemento) {
   document.getElementById("aba-postagens").style.display = "none";
   document.getElementById("aba-midias").style.display = "none";
   document.querySelector(".redes-sociais").style.paddingBottom = "27px";
-  document.getElementById("secao-login").style.display = "block";
+  document.getElementById("secao-login").style.display = "none";
+  document.getElementById("modalPix").style.display = "flex";
+  document.getElementById("emailStep").style.display = "block";
+  document.getElementById("qrStep").style.display = "none";
+  document.getElementById("emailPix").value = "";
+  document.getElementById("qrCode").innerHTML = "";
+  document.getElementById("statusPix").innerText = "Aguardando pagamento...";
+  document.getElementById("erroEmail").style.display = "none";
 }
 
 /* LOGIN */
